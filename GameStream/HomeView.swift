@@ -9,7 +9,24 @@ import SwiftUI
 
 struct HomeView: View {
     var body: some View {
-        Text("pantallahome")
+        TabView {
+            Text("Perfil").font(.system(size: 30, weight: .bold, design: .rounded)).tabItem {
+                Image(systemName: "person")
+                Text("Perfil")
+            }
+            Text("Juegos").font(.system(size: 30, weight: .bold, design: .rounded)).tabItem {
+                Image(systemName: "gamecontroller")
+                Text("Juegos")
+            }
+            Text("Inicio").font(.system(size: 30, weight: .bold, design: .rounded)).tabItem {
+                Image(systemName: "house")
+                Text("Inicio")
+            }
+            Text("Favoritos").font(.system(size: 30, weight: .bold, design: .rounded)).tabItem {
+                Image(systemName: "heart")
+                Text("Favoritos")
+            }
+        }
     }
 }
 
