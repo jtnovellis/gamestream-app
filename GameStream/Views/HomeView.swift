@@ -40,31 +40,12 @@ struct HomeView: View {
 }
 
 struct HomeScreenView: View {
-    @State var searchText: String = ""
-    
-    func search() {
-        print("searching \(searchText)")
-    }
     var body: some View {
         ZStack {
             Color(red: 21/255, green: 31/255, blue: 53/255).ignoresSafeArea()
             VStack {
                 Image("appLogo").resizable().aspectRatio(contentMode: .fit).frame(width: 250).padding(.vertical, 11)
-                HStack {
-                    Button {
-                        search()
-                    } label: {
-                        Image(systemName: "magnifyingglass").foregroundColor(searchText.isEmpty ? Color(.yellow) : Color("darkCyan"))
-                    }
-                    ZStack(alignment: .leading) {
-                        if searchText.isEmpty {
-                            Text("Buscar un video").foregroundColor(Color(red: 147/255, green: 177/255, blue: 185/255, opacity: 1.0))
-                            
-                        }
-                        TextField("",text: $searchText).foregroundColor(.white)
-                        
-                    }
-                }.padding([.top, .leading, .bottom], 11).background(Color(red: 40/255, green: 55/255, blue: 88/255)).clipShape(Capsule())
+                
                 ScrollView(showsIndicators: false) {
                     SubModuloHome()
                 }
@@ -73,14 +54,77 @@ struct HomeScreenView: View {
     }
 }
 
-struct SubModuloHome:View {
-    @State var url = "https://cdn.cloudflare.steamstatic.com/steam/apps/256658589/movie480.mp4"
-    @State var isPlayerActive = false
+struct SubModuloHome: View {
+    @State var url = VideosUrls(mobile: "", tablet: "")
+    @State var title: String = ""
+    @State var studio: String = ""
+    @State var calification: String = ""
+    @State var publicYear: String = ""
+    @State var description: String = ""
+    @State var tags: [String] = [""]
+    @State var imageUrl: [String] = [""]
+    @State var platforms: [String] = [""]
+
+    
     let urlVideos: [String] = [
         "https://cdn.cloudflare.steamstatic.com/steam/apps/256658589/movie480.mp4","https://cdn.cloudflare.steamstatic.com/steam/apps/256671638/movie480.mp4","https://cdn.cloudflare.steamstatic.com/steam/apps/256720061/movie480.mp4","https://cdn.cloudflare.steamstatic.com/steam/apps/256814567/movie480.mp4","https://cdn.cloudflare.steamstatic.com/steam/apps/256705156/movie480.mp4","https://cdn.cloudflare.steamstatic.com/steam/apps/256801252/movie480.mp4","https://cdn.cloudflare.steamstatic.com/steam/apps/256757119/movie480.mp4"
     ]
+    @State var newUrl: String = ""
+    
+    @State var searchText: String = ""
+    @State var isPlayerActive = false
+    @State var isGameInfoEmpty = false
+    @ObservedObject var gameFound = SearchGameModel()
+    @State var isGameViewActive = false
+    
+    
+    func searchGame(name: String) {
+        gameFound.search(gameName: name)
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.3) {
+            print("amount E: \(gameFound.gameInfo.count)")
+            
+            if gameFound.gameInfo.count == 0 {
+                isGameInfoEmpty = true
+            } else {
+                url = gameFound.gameInfo[0].videosUrls
+                title = gameFound.gameInfo[0].title
+                studio = gameFound.gameInfo[0].studio
+                calification = gameFound.gameInfo[0].contentRaiting
+                publicYear = gameFound.gameInfo[0].publicationYear
+                description = gameFound.gameInfo[0].description
+                tags = gameFound.gameInfo[0].tags
+                imageUrl = gameFound.gameInfo[0].galleryImages
+                platforms = gameFound.gameInfo[0].platforms
+                
+                isGameInfoEmpty = true
+            }
+        }
+    }
+    
     var body: some View {
         VStack {
+            HStack {
+                Button {
+                    searchGame(name: searchText)
+                } label: {
+                    Image(systemName: "magnifyingglass").foregroundColor(searchText.isEmpty ? Color(.yellow) : Color("darkCyan"))
+                }.alert("Important!",isPresented: $isGameInfoEmpty) {
+                    Button("OK", role: .cancel) {}
+                } message: {
+                    Text("Game not found")
+                }
+                
+                ZStack(alignment: .leading) {
+                    if searchText.isEmpty {
+                        Text("Buscar un video").foregroundColor(Color(red: 147/255, green: 177/255, blue: 185/255, opacity: 1.0))
+                        
+                    }
+                    TextField("",text: $searchText).foregroundColor(.white)
+                    
+                }
+            }.padding([.top, .leading, .bottom], 11).background(Color(red: 40/255, green: 55/255, blue: 88/255)).clipShape(Capsule())
+            
             Text("LOS MÁS POPULARES")
                 .font(.title3)
                 .foregroundColor(.white)
@@ -89,13 +133,12 @@ struct SubModuloHome:View {
                 .padding(.top)
         }
         NavigationLink {
-            VideoPlayer(player: AVPlayer(url: URL(string: url)!))
-                .frame(width: 420, height: 360, alignment: .center)
+            DetailGameView(GameViewObject(game: Game(title: title, studio: studio, contentRaiting: calification, publicationYear: publicYear, description: description, platforms: platforms, tags: tags, videosUrls: url, galleryImages: imageUrl)))
         } label: {
             ZStack {
                 Button {
-                    url = urlVideos[0]
-                    print("url: \(url)")
+                    newUrl = urlVideos[0]
+                    print("url: \(newUrl)")
                     isPlayerActive = true
                 } label: {
                     VStack(spacing: 0) {
@@ -124,8 +167,8 @@ struct SubModuloHome:View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack {
                 Button {
-                    url = urlVideos[0]
-                    print("url: \(url)")
+                    newUrl = urlVideos[0]
+                    print("url: \(newUrl)")
                     isPlayerActive = true
                 } label: {
                     ZStack {
@@ -139,8 +182,8 @@ struct SubModuloHome:View {
                     }
                 }
                 Button {
-                    url = urlVideos[0]
-                    print("url: \(url)")
+                    newUrl = urlVideos[0]
+                    print("url: \(newUrl)")
                     isPlayerActive = true
                 } label: {
                     ZStack {
@@ -154,8 +197,8 @@ struct SubModuloHome:View {
                     }
                 }
                 Button {
-                    url = urlVideos[0]
-                    print("url: \(url)")
+                    newUrl = urlVideos[0]
+                    print("url: \(newUrl)")
                     isPlayerActive = true
                 } label: {
                     ZStack {
@@ -180,7 +223,7 @@ struct SubModuloHome:View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack {
                 Button {
-                    url = urlVideos[1]
+                    newUrl = urlVideos[1]
                     isPlayerActive = true
                     print("this is the category")
                 } label: {
@@ -192,7 +235,7 @@ struct SubModuloHome:View {
                     }
                 }
                 Button {
-                    url = urlVideos[2]
+                    newUrl = urlVideos[2]
                     isPlayerActive = true
                     print("this is the category")
                 } label: {
@@ -215,7 +258,7 @@ struct SubModuloHome:View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack {
                 Button {
-                    url = urlVideos[3]
+                    newUrl = urlVideos[3]
                     isPlayerActive = true
                     print("this is the category")
                 } label: {
@@ -227,7 +270,7 @@ struct SubModuloHome:View {
                     }
                 }
                 Button {
-                    url = urlVideos[4]
+                    newUrl = urlVideos[4]
                     isPlayerActive = true
                     print("this is the category")
                 } label: {

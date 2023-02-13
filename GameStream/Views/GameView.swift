@@ -11,14 +11,7 @@ import Kingfisher
 struct GameView: View {
     @ObservedObject var allGames = ViewModel()
     @State var gameviewIsActive: Bool = false
-    @State var url: String = ""
-    @State var title: String = ""
-    @State var studio: String = ""
-    @State var calification: String = ""
-    @State var publicYear: String = ""
-    @State var description: String = ""
-    @State var tags: [String] = [""]
-    @State var imageUrl: [String] = [""]
+    @State var gameViewObject: GameViewObject? = nil
     
     let formGird = [
         GridItem(.flexible()),
@@ -39,17 +32,8 @@ struct GameView: View {
                 ScrollView {
                     LazyVGrid(columns: formGird, spacing: 8) {
                         ForEach(allGames.gamesInfo, id: \.self) {
-                            game in Button {
-                                url = game.videosUrls.mobile
-                                title = game.title
-                                studio = game.studio
-                                calification = game.contentRaiting
-                                publicYear = game.publicationYear
-                                description = game.description
-                                tags = game.tags
-                                imageUrl = game.galleryImages
-                                
-                                print("Touch the \(game.title)")
+                            game in NavigationLink {
+                                DetailGameView(GameViewObject(game: game))
                             } label: {
                                 KFImage(URL(string: game.galleryImages[0])!)
                                     .resizable()
@@ -57,7 +41,6 @@ struct GameView: View {
                                     .clipShape(RoundedRectangle(cornerRadius: 4))
                                     .padding(.bottom, 12)
                             }
-
                         }
                     }
                 }
@@ -71,6 +54,29 @@ struct GameView: View {
                 }
             )
         
+    }
+}
+
+struct GameViewObject {
+    var gameviewIsActive: Bool = false
+    var url: String = ""
+    var title: String = ""
+    var studio: String = ""
+    var calification: String
+    var publicYear: String = ""
+    var description: String = ""
+    var tags: [String] = [""]
+    var imageUrl: [String] = [""]
+    
+    init(game: Game) {
+        url = game.videosUrls.mobile
+        title = game.title
+        studio = game.studio
+        calification = game.contentRaiting
+        publicYear = game.publicationYear
+        description = game.description
+        tags = game.tags
+        imageUrl = game.galleryImages
     }
 }
 
