@@ -15,7 +15,6 @@ struct HomeView: View {
         UITabBar.appearance().backgroundColor = UIColor(Color("tabColor").opacity(0.8))
         UITabBar.appearance().isTranslucent = true
         print("Starting Home View")
-        
     }
     
     var body: some View {
@@ -23,19 +22,19 @@ struct HomeView: View {
             Text("Perfil").font(.system(size: 30, weight: .bold, design: .rounded)).tabItem {
                 Image(systemName: "person")
                 Text("Perfil")
-            }.tag(0).toolbarBackground(Color.white, for: .tabBar)
-            Text("Juegos").font(.system(size: 30, weight: .bold, design: .rounded)).tabItem {
+            }.tag(0).toolbarBackground(Color.black, for: .tabBar)
+            GameView().tabItem {
                 Image(systemName: "gamecontroller")
                 Text("Juegos")
-            }.tag(1).toolbarBackground(Color.white, for: .tabBar)
+            }.tag(1).toolbarBackground(Color.black, for: .tabBar)
             HomeScreenView().tabItem {
                 Image(systemName: "house")
                 Text("Inicio")
-            }.tag(2).toolbarBackground(Color.white, for: .tabBar)
+            }.tag(2).toolbarBackground(Color.black, for: .tabBar)
             Text("Favoritos").font(.system(size: 30, weight: .bold, design: .rounded)).tabItem {
                 Image(systemName: "heart")
                 Text("Favoritos")
-            }.tag(3).toolbarBackground(Color.white, for: .tabBar)
+            }.tag(3).toolbarBackground(Color.black, for: .tabBar)
         }.accentColor(.white).navigationBarBackButtonHidden(true)
     }
 }
